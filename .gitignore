@@ -1,0 +1,12 @@
+# Bảo mật
+.env
+
+# Dependencies
+/vendor/
+
+# IDE & OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
