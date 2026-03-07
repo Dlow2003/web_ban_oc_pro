@@ -4,7 +4,7 @@ namespace App\Middlewares;
 class AuthMiddleware {
     public function handle() {
         if (!isset($_SESSION['user'])) {
-            // Nếu chưa đăng nhập, đá về trang login
+            
             header('Location: /web_ban_oc_pro/public/login');
             exit();
         }

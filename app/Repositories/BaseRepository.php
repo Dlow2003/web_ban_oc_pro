@@ -10,7 +10,6 @@ abstract class BaseRepository {
         $this->db = Database::getInstance()->getConnection();
     }
 
-    // Quản lý Transaction cho các tác vụ quan trọng (Đặt hàng, Thanh toán)
     public function beginTransaction() {
         return $this->db->beginTransaction();
     }
@@ -23,7 +22,6 @@ abstract class BaseRepository {
         return $this->db->rollBack();
     }
 
-    // Ví dụ một hàm lấy tất cả bản ghi dùng chung
     public function all($table) {
         $stmt = $this->db->query("SELECT * FROM $table");
         return $stmt->fetchAll();
