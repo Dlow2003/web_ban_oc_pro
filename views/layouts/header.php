@@ -14,7 +14,7 @@
     <div class="container-fluid px-4">
         <a class="navbar-brand fw-bold d-flex align-items-center" href="/web_ban_oc_pro/public/">
             <img src="https://cdn-icons-png.flaticon.com/512/3081/3081884.png" width="40" class="me-2" style="filter: brightness(0) invert(1);">
-            ỐC VKU PRO
+            ỐC SV
         </a>
         
         <div class="collapse navbar-collapse" id="navbarNav">
@@ -48,3 +48,55 @@
         </div>
     </div>
 </nav>
+<style>
+.product-name {
+    height: 3rem; 
+    line-height: 1.5rem;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 1; 
+    -webkit-box-orient: vertical;
+}
+
+.product-desc {
+    height: 2.8rem;
+    font-size: 0.85rem;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    margin-bottom: 10px;
+}
+
+.product-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+.product-img-container {
+    position: relative;
+    overflow: hidden;
+}
+
+.badge-custom {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: bold;
+    text-transform: uppercase;
+    z-index: 2;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.badge-new {
+    background-color: #28a745;
+    color: white;
+}
+
+.badge-hot {
+    background-color: #ff0000;
+    color: white;
+}
+}</style>

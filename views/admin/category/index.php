@@ -9,14 +9,14 @@
 <body class="bg-light">
     <div class="container mt-5">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="text-primary">Quản lý các loại ốc</h2>
+            <h2 class="text-primary">Quản lý các loại</h2>
             <a href="/web_ban_oc_pro/public/admin/category/add" class="btn btn-success">
-                <i class="fas fa-plus"></i> Thêm loại ốc mới
+                <i class="fas fa-plus"></i> Thêm loại  mới
             </a>
         </div>
 
         <?php if(isset($_GET['msg']) && $_GET['msg'] == 'added'): ?>
-            <div class="alert alert-success">Đã thêm loại ốc mới thành công!</div>
+            <div class="alert alert-success">Đã thêm loại  mới thành công!</div>
         <?php endif; ?>
 
         <div class="card shadow">
@@ -50,7 +50,7 @@
                             </tr>
                             <?php endforeach; ?>
                         <?php else: ?>
-                            <tr><td colspan="5" class="text-center">Chưa có loại ốc nào được thêm.</td></tr>
+                            <tr><td colspan="5" class="text-center">Chưa có loại  nào được thêm.</td></tr>
                         <?php endif; ?>
                     </tbody>
                 </table>

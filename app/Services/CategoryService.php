@@ -10,13 +10,15 @@ class CategoryService {
     public function __construct() {
         $this->repository = new CategoryRepository();
     }
+    public function countAll() {
+    return $this->repository->countAll();
+}
 
     public function storeCategory($data) {
     $slug = \App\Helpers\StringHelper::make_slug($data['name']);
     $originalSlug = $slug;
     $count = 1;
 
-    // Vòng lặp kiểm tra trùng, nếu trùng thì tăng số đếm ở đuôi
     while ($this->repository->existsBySlug($slug)) {
         $slug = $originalSlug . '-' . $count;
         $count++;

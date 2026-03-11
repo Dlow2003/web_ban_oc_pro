@@ -67,10 +67,15 @@ class AuthController extends HomeController {
         }
     }
 
-    public function logout() {
-        unset($_SESSION['user']);
-        session_destroy();
-        header('Location: /web_ban_oc_pro/public/login');
-        exit();
+
+public function logout() {
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
     }
+    unset($_SESSION['user']);
+
+    session_destroy();
+    header('Location: /web_ban_oc_pro/public/login');
+    exit();
+}
 }

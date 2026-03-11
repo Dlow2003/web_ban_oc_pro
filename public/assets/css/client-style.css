@@ -88,3 +88,34 @@ body {
     background-color: var(--vku-orange);
     border: none;
 }
+.navbar {
+    z-index: 1050 !important; 
+}
+
+.dropdown-menu {
+    z-index: 9999 !important;
+    margin-top: 10px !important; 
+    border-radius: 12px !important; 
+}
+
+.sticky-top {
+    overflow: visible !important;
+}
+footer a:hover {
+    color: #ff7a00 !important;
+    transition: 0.3s;
+}
+
+.text-orange {
+    color: #ff7a00;
+}
+
+/* Hiệu ứng bo tròn cho bản đồ */
+footer iframe {
+    filter: grayscale(20%);
+    transition: 0.5s;
+}
+
+footer iframe:hover {
+    filter: grayscale(0%);
+}

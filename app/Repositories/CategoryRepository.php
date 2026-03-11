@@ -8,6 +8,11 @@ class CategoryRepository extends BaseRepository {
         $stmt = $this->db->query("SELECT * FROM {$this->table} ORDER BY id DESC");
         return $stmt->fetchAll();
     }
+    public function countAll() {
+    $sql = "SELECT COUNT(*) as total FROM categories";
+    $stmt = $this->db->query($sql);
+    return $stmt->fetch()['total'];
+}
 
     public function findById($id) {
         $stmt = $this->db->prepare("SELECT * FROM {$this->table} WHERE id = ?");

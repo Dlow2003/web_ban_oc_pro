@@ -11,7 +11,7 @@
 
 <nav class="navbar navbar-expand-lg navbar-dark shadow-sm py-3" style="background-color: #ff7a00;">
     <div class="container">
-        <a class="navbar-brand fw-bold" href="#">ỐC VKU PRO</a>
+        <a class="navbar-brand fw-bold" href="#">ỐC </a>
         <div class="ms-auto d-flex align-items-center text-white">
             <span class="me-3">Trang chủ</span>
             <span class="me-3">Đơn hàng</span>
