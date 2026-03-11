@@ -1,0 +1,25 @@
+
+.card-header.bg-warning {
+    background-color: #ffc107 !important;
+    border-bottom: 2px solid #e0a800;
+}
+
+.form-label {
+    font-weight: 600;
+    color: #495057;
+}
+
+.shadow {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border: none;
+    transition: 0.3s;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+}

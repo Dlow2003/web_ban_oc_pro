@@ -1,0 +1,121 @@
+@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;700&display=swap');
+
+body { 
+    font-family: 'Lexend', sans-serif; 
+}
+
+.hero-section {
+    background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), 
+                url('https://images.unsplash.com/photo-1551024323-a2d8d533d7c9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80');
+    background-size: cover;
+    background-position: center;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    color: white;
+}
+
+.btn-vku {
+    background-color: #28a745;
+    border: none;
+    padding: 12px 30px;
+    font-weight: bold;
+    transition: 0.3s;
+    border-radius: 30px;
+}
+
+.btn-vku:hover {
+    background-color: #218838;
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+}
+
+.feature-box {
+    padding: 30px;
+    border-radius: 15px;
+    background: #fff;
+    transition: 0.3s;
+    border-bottom: 4px solid transparent;
+}
+
+.feature-box:hover {
+    transform: translateY(-10px);
+    border-bottom: 4px solid #28a745;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+.btn-warning {
+    background-color: #ffc107;
+    border: none;
+    transition: 0.3s;
+}
+
+.btn-warning:hover {
+    background-color: #e0a800;
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(255, 193, 7, 0.4);
+}
+
+.dropdown-menu {
+    border-radius: 12px;
+    border: none;
+    margin-top: 10px;
+}
+:root {
+    --vku-orange: #ff7a00;
+}
+
+.text-orange { color: var(--vku-orange) !important; }
+.bg-orange { background-color: var(--vku-orange) !important; }
+
+.item-food {
+    transition: 0.3s;
+    cursor: pointer;
+}
+
+.item-food:hover {
+    transform: translateX(10px);
+    background-color: #fffaf5;
+    box-shadow: 0 5px 15px rgba(255,122,0,0.1) !important;
+}
+
+.list-group-item-action:hover {
+    color: var(--vku-orange) !important;
+    background-color: #fffaf5 !important;
+    border-left: 4px solid var(--vku-orange) !important;
+}
+
+.btn-warning {
+    background-color: var(--vku-orange);
+    border: none;
+}
+.navbar {
+    z-index: 1050 !important; 
+}
+
+.dropdown-menu {
+    z-index: 9999 !important;
+    margin-top: 10px !important; 
+    border-radius: 12px !important; 
+}
+
+.sticky-top {
+    overflow: visible !important;
+}
+footer a:hover {
+    color: #ff7a00 !important;
+    transition: 0.3s;
+}
+
+.text-orange {
+    color: #ff7a00;
+}
+
+/* Hiệu ứng bo tròn cho bản đồ */
+footer iframe {
+    filter: grayscale(20%);
+    transition: 0.5s;
+}
+
+footer iframe:hover {
+    filter: grayscale(0%);
+}
