@@ -29,7 +29,7 @@ class ProductRepository
     $stmt = $this->db->query($sql);
     return $stmt->fetch()['total'];
 }
-public function getByPage($page, $perPage, $categoryId = null) {
+public function getByPage($page, $perPage, $categoryId = null, $keyword = null) {
     $offset = ($page - 1) * $perPage;
     
     $sql = "SELECT p.*, c.name as category_name 
@@ -40,16 +40,36 @@ public function getByPage($page, $perPage, $categoryId = null) {
     if ($categoryId) {
         $sql .= " AND p.category_id = :cat_id";
     }
+
+    if ($keyword) {
+        $sql .= " AND p.name LIKE :keyword";
+    }
     
     $sql .= " ORDER BY p.id DESC LIMIT :limit OFFSET :offset";
     
     $stmt = $this->db->prepare($sql);
     
-    if ($categoryId) {
-        $stmt->bindValue(':cat_id', (int)$categoryId, \PDO::PARAM_INT);
-    }
+    if ($categoryId) $stmt->bindValue(':cat_id', (int)$categoryId, \PDO::PARAM_INT);
+    if ($keyword) $stmt->bindValue(':keyword', "%$keyword%", \PDO::PARAM_STR);
+    
     $stmt->bindValue(':limit', (int)$perPage, \PDO::PARAM_INT);
     $stmt->bindValue(':offset', (int)$offset, \PDO::PARAM_INT);
+    
+    $stmt->execute();
+    return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+}
+public function getRelated($categoryId, $productId, $limit = 4) {
+    $sql = "SELECT * FROM products 
+            WHERE category_id = :category_id 
+            AND id != :product_id 
+            AND status = 1 
+            ORDER BY RAND() 
+            LIMIT :limit";
+            
+    $stmt = $this->db->prepare($sql);
+    $stmt->bindValue(':category_id', (int)$categoryId, \PDO::PARAM_INT);
+    $stmt->bindValue(':product_id', (int)$productId, \PDO::PARAM_INT);
+    $stmt->bindValue(':limit', (int)$limit, \PDO::PARAM_INT);
     
     $stmt->execute();
     return $stmt->fetchAll(\PDO::FETCH_ASSOC);

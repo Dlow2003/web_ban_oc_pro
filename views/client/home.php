@@ -1,5 +1,7 @@
 <?php include __DIR__ . '/../layouts/header.php'; ?>
 
+<link rel="stylesheet" href="/web_ban_oc_pro/public/assets/css/client-style.css">
+
 <div class="container-fluid mt-3 px-2 px-md-4">
     <div class="row g-3">
         <div class="col-md-2 d-none d-md-block">
@@ -21,7 +23,7 @@
         </div>
 
         <div class="col-12 col-md-7">
-            
+
             <div class="d-block d-md-none mb-3">
                 <div class="d-flex overflow-auto flex-nowrap gap-2 pb-2 shadow-scrollbar">
                     <a href="/web_ban_oc_pro/public/" class="btn btn-sm <?= empty($currentCategory) ? 'btn-orange text-white' : 'btn-outline-orange' ?> rounded-pill text-nowrap">Tất cả</a>
@@ -33,74 +35,149 @@
                 </div>
             </div>
 
-            <form action="" method="GET" class="input-group mb-4 shadow-sm bg-white rounded-pill overflow-hidden border">
+            <form action="/web_ban_oc_pro/public/" method="GET" class="input-group mb-4 shadow-sm bg-white rounded-pill border position-relative" style="overflow: visible;">
                 <span class="input-group-text bg-white border-0 ps-4"><i class="fas fa-search text-muted"></i></span>
-                <input type="text" name="search" class="form-control border-0 py-3" placeholder="Hôm nay bạn muốn ăn ốc gì?">
+                <input type="text" name="search" class="form-control border-0 py-3"
+                    placeholder="Hôm nay bạn muốn ăn gì?"
+                    autocomplete="off"
+                    value="<?= htmlspecialchars($keyword ?? '') ?>">
+
+                <?php if (isset($currentCategory)): ?>
+                    <input type="hidden" name="category" value="<?= $currentCategory ?>">
+                <?php endif; ?>
+
                 <button type="submit" class="btn btn-orange px-4 text-white">Tìm</button>
+
+                <div id="search-results" class="search-results-ajax shadow-lg"></div>
             </form>
 
-            <div class="row g-2 g-md-3" id="product-list">
-                <?php if(!empty($products)): ?>
-                    <?php foreach($products as $item): ?>
-                    <div class="col-6 col-lg-4 mb-3 d-flex align-items-stretch">
-                        <div class="card product-card shadow-sm border-0 rounded-4 w-100 overflow-hidden">
-                            <div class="product-img-container position-relative">
-                                <?php if($item['id'] > 10): ?>
-                                    <span class="badge-custom badge-new">Món mới</span>
-                                <?php endif; ?>
+            <?php if (!empty($keyword)): ?>
+                <p class="mb-4">Kết quả cho: <strong class="text-orange">"<?= htmlspecialchars($keyword) ?>"</strong></p>
+            <?php endif; ?>
 
-                                <img src="/web_ban_oc_pro/public/assets/uploads/products/<?= $item['image'] ?>" 
-                                     class="card-img-top" 
-                                     style="height: 160px; object-fit: cover;">
-                            </div>
-                            
-                            <div class="card-body d-flex flex-column p-2 p-md-3">
-                                <h6 class="fw-bold product-name mb-1"><?= htmlspecialchars($item['name']) ?></h6>
-                                <div class="mt-auto">
-                                    <p class="text-danger fw-bold mb-2"><?= number_format($item['price'], 0, ',', '.') ?>đ</p>
-                                    <button class="btn btn-warning btn-sm w-100 text-white rounded-pill shadow-sm py-2">
-                                        <i class="fas fa-shopping-cart"></i> <span class="d-none d-sm-inline">ĐẶT MÓN</span>
-                                    </button>
+            <div class="row g-2 g-md-3" id="product-list">
+                <?php if (!empty($products)): ?>
+                    <?php foreach ($products as $item): ?>
+                        <div class="col-6 col-lg-4 mb-3 d-flex align-items-stretch">
+                            <div class="card product-card shadow-sm border-0 rounded-4 w-100 overflow-hidden">
+
+                                <a href="/web_ban_oc_pro/public/product/detail/<?= $item['id'] ?>" class="text-decoration-none text-dark">
+                                    <div class="product-img-container position-relative">
+                                        <?php if ($item['id'] > 10): ?>
+                                            <span class="badge-custom badge-new" style="position: absolute; top: 10px; left: 10px; background: red; color: white; padding: 2px 8px; border-radius: 10px; font-size: 10px; z-index: 1;">Mới</span>
+                                        <?php endif; ?>
+                                        <img src="/web_ban_oc_pro/public/assets/uploads/products/<?= $item['image'] ?>"
+                                            class="card-img-top"
+                                            style="height: 160px; object-fit: cover;">
+                                    </div>
+
+                                    <div class="card-body p-2 p-md-3 pb-0">
+                                        <h6 class="fw-bold product-name mb-1"><?= htmlspecialchars($item['name']) ?></h6>
+                                    </div>
+                                </a>
+
+                                <div class="card-body d-flex flex-column p-2 p-md-3 pt-0">
+                                    <div class="mt-auto">
+                                        <p class="text-danger fw-bold mb-2"><?= number_format($item['price'], 0, ',', '.') ?>đ</p>
+                                        <button class="btn btn-warning btn-sm w-100 text-white rounded-pill shadow-sm py-2 btn-add-cart"
+                                            data-id="<?= $item['id'] ?>"
+                                            data-logged="<?= isset($_SESSION['user']) ? 'true' : 'false' ?>">
+                                            <i class="fas fa-shopping-cart"></i> ĐẶT MÓN
+                                        </button>
+
+                                    </div>
                                 </div>
+
                             </div>
                         </div>
-                    </div>
                     <?php endforeach; ?>
                 <?php else: ?>
                     <div class="col-12 text-center py-5">
+                        <img src="https://cdn-icons-png.flaticon.com/512/5058/5058432.png" style="width: 80px; opacity: 0.2;" class="mb-3">
                         <p class="text-muted">Không tìm thấy món ốc nào phù hợp.</p>
                     </div>
                 <?php endif; ?>
             </div>
 
-            <?php if ($totalPages > 1): ?>
-            <nav class="mt-4">
-                <ul class="pagination pagination-sm justify-content-center">
-                    <li class="page-item <?= ($currentPage <= 1) ? 'disabled' : '' ?>">
-                        <a class="page-link rounded-pill px-3" href="?page=<?= $currentPage - 1 ?>&category=<?= $currentCategory ?? '' ?>">Trước</a>
-                    </li>
-                    <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                        <li class="page-item <?= ($i == $currentPage) ? 'active' : '' ?>">
-                            <a class="page-link rounded-circle mx-1" href="?page=<?= $i ?>&category=<?= $currentCategory ?? '' ?>"><?= $i ?></a>
+            <?php if (isset($totalPages) && $totalPages > 1): ?>
+                <nav class="mt-4">
+                    <ul class="pagination pagination-sm justify-content-center">
+                        <li class="page-item <?= ($currentPage <= 1) ? 'disabled' : '' ?>">
+                            <a class="page-link rounded-pill px-3" href="?page=<?= $currentPage - 1 ?>&category=<?= $currentCategory ?? '' ?>&search=<?= urlencode($keyword ?? '') ?>">Trước</a>
                         </li>
-                    <?php endfor; ?>
-                    <li class="page-item <?= ($currentPage >= $totalPages) ? 'disabled' : '' ?>">
-                        <a class="page-link rounded-pill px-3 ms-2" href="?page=<?= $currentPage + 1 ?>&category=<?= $currentCategory ?? '' ?>">Sau</a>
-                    </li>
-                </ul>
-            </nav>
+                        <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                            <li class="page-item <?= ($i == $currentPage) ? 'active' : '' ?>">
+                                <a class="page-link rounded-circle mx-1" href="?page=<?= $i ?>&category=<?= $currentCategory ?? '' ?>&search=<?= urlencode($keyword ?? '') ?>"><?= $i ?></a>
+                            </li>
+                        <?php endfor; ?>
+                        <li class="page-item <?= ($currentPage >= $totalPages) ? 'disabled' : '' ?>">
+                            <a class="page-link rounded-pill px-3 ms-2" href="?page=<?= $currentPage + 1 ?>&category=<?= $currentCategory ?? '' ?>&search=<?= urlencode($keyword ?? '') ?>">Sau</a>
+                        </li>
+                    </ul>
+                </nav>
             <?php endif; ?>
         </div>
 
         <div class="col-md-3 d-none d-md-block">
-            <div class="card border-0 shadow-sm sticky-top rounded-4" style="top: 80px; min-height: 400px;">
-                <div class="card-header bg-white border-0 pt-4 pb-0 text-center">
+            <div class="card border-0 shadow-sm sticky-top rounded-4" style="top: 80px; min-height: 400px; display: flex; flex-column;">
+                <div class="card-header bg-white border-0 pt-4 pb-2 text-center">
                     <h5 class="fw-bold">GIỎ HÀNG CỦA BẠN</h5>
+                    <?php if (isset($_SESSION['user'])): ?>
+                        <div class="small text-muted">
+                            <i class="fas fa-map-marker-alt text-orange"></i>
+                            <?php
+                            if ($_SESSION['user']['type'] == 'at_store') {
+                                echo 'Bàn: ' . (!empty($_SESSION['user']['table']) ? $_SESSION['user']['table'] : '...');
+                            } else {
+                                echo 'Ship tận nơi';
+                            }
+                            ?>
+                        </div>
+                    <?php endif; ?>
                 </div>
-                <div class="card-body text-center d-flex flex-column justify-content-center">
-                    <img src="https://cdn-icons-png.flaticon.com/512/1162/1162456.png" class="mx-auto mb-3" style="width: 80px; opacity: 0.3;">
-                    <p class="small text-secondary">Chưa có món nào được chọn.</p>
+
+                <div class="card-body p-2 overflow-auto" style="max-height: 450px;">
+                    <?php if (!empty($_SESSION['cart'])): ?>
+                        <div class="list-group list-group-flush">
+                            <?php
+                            $totalOrder = 0;
+                            foreach ($_SESSION['cart'] as $id => $item):
+                                $subTotal = $item['price'] * $item['quantity'];
+                                $totalOrder += $subTotal;
+                            ?>
+                                <div class="list-group-item border-0 px-0 py-3">
+                                    <div class="d-flex align-items-center">
+                                        <img src="/web_ban_oc_pro/public/assets/uploads/products/<?= $item['image'] ?>"
+                                            class="rounded-3 me-2" style="width: 50px; height: 50px; object-fit: cover;">
+                                        <div class="flex-grow-1">
+                                            <h6 class="mb-0 small fw-bold text-truncate" style="max-width: 120px;"><?= $item['name'] ?></h6>
+                                            <div class="small text-danger"><?= number_format($item['price'], 0, ',', '.') ?>đ x <?= $item['quantity'] ?></div>
+                                        </div>
+                                        <div class="fw-bold small"><?= number_format($subTotal, 0, ',', '.') ?>đ</div>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php else: ?>
+                        <div class="text-center py-5">
+                            <img src="https://cdn-icons-png.flaticon.com/512/1162/1162456.png" class="mx-auto mb-3" style="width: 60px; opacity: 0.3;">
+                            <p class="small text-secondary">Chưa có món nào được chọn.</p>
+                        </div>
+                    <?php endif; ?>
                 </div>
+
+                <?php if (!empty($_SESSION['cart'])): ?>
+                    <div class="card-footer bg-white border-0 pt-0 pb-4">
+                        <hr>
+                        <div class="d-flex justify-content-between mb-3 px-2">
+                            <span class="fw-bold">Tổng cộng:</span>
+                            <span class="text-danger fw-bold fs-5"><?= number_format($totalOrder, 0, ',', '.') ?>đ</span>
+                        </div>
+                        <a href="/web_ban_oc_pro/public/cart" class="btn btn-orange w-100 rounded-pill fw-bold py-2 shadow-sm">
+                            XEM GIỎ HÀNG
+                        </a>
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
     </div>
@@ -110,53 +187,66 @@
     <i class="fas fa-shopping-basket"></i>
     <span class="badge rounded-pill bg-danger"><?= count($_SESSION['cart'] ?? []) ?></span>
 </a>
+<div class="modal fade" id="orderModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="fw-bold">Thông tin đặt món</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="form-confirm-order">
+                    <input type="hidden" id="modal-product-id">
 
-<style>
-    .btn-orange { background-color: #ff7a00; color: white; }
-    .btn-outline-orange { color: #ff7a00; border: 1px solid #ff7a00; }
-    .text-orange { color: #ff7a00 !important; }
-    
-    .product-card { transition: transform 0.2s; }
-    .product-card:hover { transform: translateY(-5px); }
-    
-    .product-name {
-        height: 2.4rem;
-        line-height: 1.2rem;
-        overflow: hidden;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-    }
+                    <div class="mb-3">
+                        <label class="small fw-bold">Họ tên của bạn</label>
+                        <input type="text" id="cust-name" class="form-control rounded-pill" placeholder="VD: Nguyễn Văn A" required>
+                    </div>
 
-    .shadow-scrollbar::-webkit-scrollbar { display: none; }
-    .shadow-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+                    <div class="mb-3">
+                        <label class="small fw-bold">Số điện thoại</label>
+                        <input type="tel" id="cust-phone" class="form-control rounded-pill" placeholder="0905xxxxxx" required>
+                    </div>
 
-    .btn-cart-float {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        background-color: #ff7a00;
-        color: white;
-        width: 55px;
-        height: 55px;
-        border-radius: 50%;
-        align-items: center;
-        justify-content: center;
-        z-index: 1000;
-        text-decoration: none;
-        font-size: 20px;
-    }
-    .btn-cart-float .badge {
-        position: absolute;
-        top: 0;
-        right: 0;
-        font-size: 10px;
-    }
+                    <div class="mb-3">
+                        <label class="small fw-bold">Hình thức nhận món</label>
+                        <div class="d-flex gap-4 mt-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="orderType" id="typeAtStore" value="at_store" checked>
+                                <label class="form-check-label fw-bold" for="typeAtStore text-success">Tại quán</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="orderType" id="typeShip" value="ship">
+                                <label class="form-check-label fw-bold" for="typeShip text-primary">Giao tận nơi</label>
+                            </div>
+                        </div>
+                    </div>
 
-    @media (max-width: 576px) {
-        .card-img-top { height: 120px !important; }
-        .product-name { font-size: 0.85rem !important; }
-    }
-</style>
+                    <div class="mb-3" id="table-group">
+                        <label class="small fw-bold">Chọn số bàn</label>
+                        <select id="table-number" class="form-select rounded-pill">
+                            <option value="">-- Chọn bàn --</option>
+                            <?php for ($i = 1; $i <= 20; $i++): ?>
+                                <option value="<?= $i ?>">Bàn số <?= $i ?></option>
+                            <?php endfor; ?>
+                            <option value="mang_ve">Mang về (Chờ tại quầy)</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3 d-none" id="address-group">
+                        <label class="small fw-bold">Địa chỉ nhận hàng</label>
+                        <textarea id="cust-address" class="form-control rounded-3" rows="2" placeholder="Số nhà, tên đường, phường/xã..."></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-orange w-100 rounded-pill py-2 fw-bold mt-2 shadow">XÁC NHẬN ĐẶT MÓN</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="/web_ban_oc_pro/public/assets/js/search.js"></script>
+<?php include __DIR__ . '/../layouts/modal_order.php'; ?>
 
 <?php include __DIR__ . '/../layouts/footer.php'; ?>

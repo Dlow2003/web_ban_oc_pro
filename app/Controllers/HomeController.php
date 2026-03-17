@@ -16,27 +16,50 @@ class HomeController
         $this->productService = new ProductService();
     }
 
-    public function index()
-    {
-        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-        $categoryId = isset($_GET['category']) ? (int)$_GET['category'] : null;
-        
+    public function index() {
+    $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+    $categoryId = isset($_GET['category']) ? (int)$_GET['category'] : null;
+    $keyword = isset($_GET['search']) ? trim($_GET['search']) : null; 
 
-        if ($page < 1) $page = 1;
+    $paginationData = $this->productService->getPaginated($page, 9, $categoryId, $keyword); 
 
-        $paginationData = $this->productService->getPaginated($page, 8, $categoryId);
+    $data = [
+        'title' => 'Ốc Ngon VKU - Kết quả tìm kiếm',
+        'categories' => $this->categoryService->getList(),
+        'products' => $paginationData['products'],
+        'totalPages' => $paginationData['totalPages'],
+        'currentPage' => $page,
+        'currentCategory' => $categoryId,
+        'keyword' => $keyword 
+    ];
 
-        $data = [
-            'title' => 'Ốc Ngon VKU - Đặt là có!',
-            'categories' => $this->categoryService->getList(),
-            'products' => $paginationData['products'],
-            'totalPages' => $paginationData['totalPages'],
-            'currentPage' => $paginationData['currentPage'],
-            'currentCategory' => $categoryId 
-        ];
+    $this->render('client/home', $data);
+}
+public function searchApi() {
+    $keyword = isset($_GET['search']) ? trim($_GET['search']) : '';
+    $products = [];
 
-        $this->render('client/home', $data);
+    if (strlen($keyword) >= 2) {
+        $result = $this->productService->getPaginated(1, 5, null, $keyword);
+        $products = $result['products'];
     }
+    if (empty($products)) {
+        return; 
+    }
+        foreach ($products as $item) {
+    $imgPath = "/web_ban_oc_pro/public/assets/uploads/products/" . $item['image'];
+
+    echo '
+    <a href="?search=' . urlencode($item['name']) . '" class="list-group-item list-group-item-action d-flex align-items-center">
+        <img src="' . $imgPath . '" style="width:45px; height:45px; object-fit:cover;" class="rounded me-3 shadow-sm">
+        <div>
+            <div class="fw-bold small text-dark">' . htmlspecialchars($item['name']) . '</div>
+            <div class="text-danger small fw-bold">' . number_format($item['price'], 0, ',', '.') . 'đ</div>
+        </div>
+    </a>';
+}
+    exit;
+}
 
 
 
