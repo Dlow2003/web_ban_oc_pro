@@ -1,4 +1,5 @@
 <?php
+
 require_once __DIR__ . '/../vendor/autoload.php';
 
 
@@ -65,4 +66,8 @@ $router->get('/product/detail/(\d+)', 'ProductController@detail');
 $router->get('/cart', 'CartController@index');
 $router->post('/cart/remove', 'CartController@remove');
 $router->post('/cart/update', 'CartController@update');
+$router->post('/order/checkout', 'OrderController@checkout');
+$router->get('/order/success', 'OrderController@success');
+$router ->get('/order/history','OrderController@history');
+
 $router->run();

@@ -23,7 +23,6 @@
         </div>
 
         <div class="col-12 col-md-7">
-
             <div class="d-block d-md-none mb-3">
                 <div class="d-flex overflow-auto flex-nowrap gap-2 pb-2 shadow-scrollbar">
                     <a href="/web_ban_oc_pro/public/" class="btn btn-sm <?= empty($currentCategory) ? 'btn-orange text-white' : 'btn-outline-orange' ?> rounded-pill text-nowrap">Tất cả</a>
@@ -42,12 +41,11 @@
                     autocomplete="off"
                     value="<?= htmlspecialchars($keyword ?? '') ?>">
 
-                <?php if (isset($currentCategory)): ?>
-                    <input type="hidden" name="category" value="<?= $currentCategory ?>">
+                <?php if (!empty($currentCategory)): ?>
+                    <input type="hidden" name="category" value="<?= htmlspecialchars($currentCategory) ?>">
                 <?php endif; ?>
 
                 <button type="submit" class="btn btn-orange px-4 text-white">Tìm</button>
-
                 <div id="search-results" class="search-results-ajax shadow-lg"></div>
             </form>
 
@@ -60,15 +58,15 @@
                     <?php foreach ($products as $item): ?>
                         <div class="col-6 col-lg-4 mb-3 d-flex align-items-stretch">
                             <div class="card product-card shadow-sm border-0 rounded-4 w-100 overflow-hidden">
-
                                 <a href="/web_ban_oc_pro/public/product/detail/<?= $item['id'] ?>" class="text-decoration-none text-dark">
                                     <div class="product-img-container position-relative">
-                                        <?php if ($item['id'] > 10): ?>
+                                        <?php if (isset($item['id']) && $item['id'] > 10): ?>
                                             <span class="badge-custom badge-new" style="position: absolute; top: 10px; left: 10px; background: red; color: white; padding: 2px 8px; border-radius: 10px; font-size: 10px; z-index: 1;">Mới</span>
                                         <?php endif; ?>
-                                        <img src="/web_ban_oc_pro/public/assets/uploads/products/<?= $item['image'] ?>"
+                                        <img src="/web_ban_oc_pro/public/assets/uploads/products/<?= htmlspecialchars($item['image']) ?>"
                                             class="card-img-top"
-                                            style="height: 160px; object-fit: cover;">
+                                            style="height: 160px; object-fit: cover;"
+                                            alt="<?= htmlspecialchars($item['name']) ?>">
                                     </div>
 
                                     <div class="card-body p-2 p-md-3 pb-0">
@@ -84,16 +82,14 @@
                                             data-logged="<?= isset($_SESSION['user']) ? 'true' : 'false' ?>">
                                             <i class="fas fa-shopping-cart"></i> ĐẶT MÓN
                                         </button>
-
                                     </div>
                                 </div>
-
                             </div>
                         </div>
                     <?php endforeach; ?>
                 <?php else: ?>
                     <div class="col-12 text-center py-5">
-                        <img src="https://cdn-icons-png.flaticon.com/512/5058/5058432.png" style="width: 80px; opacity: 0.2;" class="mb-3">
+                        <img src="https://cdn-icons-png.flaticon.com/512/5058/5058432.png" style="width: 80px; opacity: 0.2;" class="mb-3" alt="No products">
                         <p class="text-muted">Không tìm thấy món ốc nào phù hợp.</p>
                     </div>
                 <?php endif; ?>
@@ -102,16 +98,19 @@
             <?php if (isset($totalPages) && $totalPages > 1): ?>
                 <nav class="mt-4">
                     <ul class="pagination pagination-sm justify-content-center">
+                        <?php 
+                            $queryStr = "&category=" . ($currentCategory ?? '') . "&search=" . urlencode($keyword ?? '');
+                        ?>
                         <li class="page-item <?= ($currentPage <= 1) ? 'disabled' : '' ?>">
-                            <a class="page-link rounded-pill px-3" href="?page=<?= $currentPage - 1 ?>&category=<?= $currentCategory ?? '' ?>&search=<?= urlencode($keyword ?? '') ?>">Trước</a>
+                            <a class="page-link rounded-pill px-3" href="?page=<?= $currentPage - 1 . $queryStr ?>">Trước</a>
                         </li>
                         <?php for ($i = 1; $i <= $totalPages; $i++): ?>
                             <li class="page-item <?= ($i == $currentPage) ? 'active' : '' ?>">
-                                <a class="page-link rounded-circle mx-1" href="?page=<?= $i ?>&category=<?= $currentCategory ?? '' ?>&search=<?= urlencode($keyword ?? '') ?>"><?= $i ?></a>
+                                <a class="page-link rounded-circle mx-1" href="?page=<?= $i . $queryStr ?>"><?= $i ?></a>
                             </li>
                         <?php endfor; ?>
                         <li class="page-item <?= ($currentPage >= $totalPages) ? 'disabled' : '' ?>">
-                            <a class="page-link rounded-pill px-3 ms-2" href="?page=<?= $currentPage + 1 ?>&category=<?= $currentCategory ?? '' ?>&search=<?= urlencode($keyword ?? '') ?>">Sau</a>
+                            <a class="page-link rounded-pill px-3 ms-2" href="?page=<?= $currentPage + 1 . $queryStr ?>">Sau</a>
                         </li>
                     </ul>
                 </nav>
@@ -119,21 +118,24 @@
         </div>
 
         <div class="col-md-3 d-none d-md-block">
-            <div class="card border-0 shadow-sm sticky-top rounded-4" style="top: 80px; min-height: 400px; display: flex; flex-column;">
+            <div class="card border-0 shadow-sm sticky-top rounded-4" style="top: 80px; min-height: 400px;">
                 <div class="card-header bg-white border-0 pt-4 pb-2 text-center">
                     <h5 class="fw-bold">GIỎ HÀNG CỦA BẠN</h5>
-                    <?php if (isset($_SESSION['user'])): ?>
-                        <div class="small text-muted">
-                            <i class="fas fa-map-marker-alt text-orange"></i>
-                            <?php
-                            if ($_SESSION['user']['type'] == 'at_store') {
-                                echo 'Bàn: ' . (!empty($_SESSION['user']['table']) ? $_SESSION['user']['table'] : '...');
-                            } else {
-                                echo 'Ship tận nơi';
-                            }
-                            ?>
-                        </div>
-                    <?php endif; ?>
+                   <?php if (isset($_SESSION['user'])): ?>
+    <div class="small text-muted">
+        <i class="fas fa-map-marker-alt text-orange"></i>
+        <?php 
+            $userType = $_SESSION['user']['type'] ?? 'at_store'; 
+            $userTable = $_SESSION['user']['table'] ?? '...';
+
+            if ($userType == 'at_store') {
+                echo 'Bàn: ' . (!empty($userTable) ? $userTable : '...');
+            } else {
+                echo 'Ship tận nơi';
+            }
+        ?>
+    </div>
+<?php endif; ?>
                 </div>
 
                 <div class="card-body p-2 overflow-auto" style="max-height: 450px;">
@@ -141,17 +143,17 @@
                         <div class="list-group list-group-flush">
                             <?php
                             $totalOrder = 0;
-                            foreach ($_SESSION['cart'] as $id => $item):
-                                $subTotal = $item['price'] * $item['quantity'];
+                            foreach ($_SESSION['cart'] as $id => $cartItem):
+                                $subTotal = $cartItem['price'] * $cartItem['quantity'];
                                 $totalOrder += $subTotal;
                             ?>
                                 <div class="list-group-item border-0 px-0 py-3">
                                     <div class="d-flex align-items-center">
-                                        <img src="/web_ban_oc_pro/public/assets/uploads/products/<?= $item['image'] ?>"
+                                        <img src="/web_ban_oc_pro/public/assets/uploads/products/<?= htmlspecialchars($cartItem['image']) ?>"
                                             class="rounded-3 me-2" style="width: 50px; height: 50px; object-fit: cover;">
                                         <div class="flex-grow-1">
-                                            <h6 class="mb-0 small fw-bold text-truncate" style="max-width: 120px;"><?= $item['name'] ?></h6>
-                                            <div class="small text-danger"><?= number_format($item['price'], 0, ',', '.') ?>đ x <?= $item['quantity'] ?></div>
+                                            <h6 class="mb-0 small fw-bold text-truncate" style="max-width: 120px;"><?= htmlspecialchars($cartItem['name']) ?></h6>
+                                            <div class="small text-danger"><?= number_format($cartItem['price'], 0, ',', '.') ?>đ x <?= $cartItem['quantity'] ?></div>
                                         </div>
                                         <div class="fw-bold small"><?= number_format($subTotal, 0, ',', '.') ?>đ</div>
                                     </div>
@@ -183,10 +185,11 @@
     </div>
 </div>
 
-<a href="/web_ban_oc_pro/public/cart" class="btn-cart-float d-flex d-md-none shadow-lg">
+<a href="/web_ban_oc_pro/public/cart" class="btn-cart-float d-flex d-md-none shadow-lg text-decoration-none">
     <i class="fas fa-shopping-basket"></i>
     <span class="badge rounded-pill bg-danger"><?= count($_SESSION['cart'] ?? []) ?></span>
 </a>
+
 <div class="modal fade" id="orderModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content rounded-4 border-0 shadow">
@@ -196,16 +199,16 @@
             </div>
             <div class="modal-body">
                 <form id="form-confirm-order">
-                    <input type="hidden" id="modal-product-id">
+                    <input type="hidden" name="id" id="modal-product-id">
 
                     <div class="mb-3">
                         <label class="small fw-bold">Họ tên của bạn</label>
-                        <input type="text" id="cust-name" class="form-control rounded-pill" placeholder="VD: Nguyễn Văn A" required>
+                        <input type="text" name="name" id="cust-name" class="form-control rounded-pill" placeholder="VD: Nguyễn Văn A" required>
                     </div>
 
                     <div class="mb-3">
                         <label class="small fw-bold">Số điện thoại</label>
-                        <input type="tel" id="cust-phone" class="form-control rounded-pill" placeholder="0905xxxxxx" required>
+                        <input type="tel" name="phone" id="cust-phone" class="form-control rounded-pill" placeholder="0905xxxxxx" required>
                     </div>
 
                     <div class="mb-3">
@@ -213,18 +216,18 @@
                         <div class="d-flex gap-4 mt-2">
                             <div class="form-check">
                                 <input class="form-check-input" type="radio" name="orderType" id="typeAtStore" value="at_store" checked>
-                                <label class="form-check-label fw-bold" for="typeAtStore text-success">Tại quán</label>
+                                <label class="form-check-label fw-bold" for="typeAtStore">Tại quán</label>
                             </div>
                             <div class="form-check">
                                 <input class="form-check-input" type="radio" name="orderType" id="typeShip" value="ship">
-                                <label class="form-check-label fw-bold" for="typeShip text-primary">Giao tận nơi</label>
+                                <label class="form-check-label fw-bold" for="typeShip">Giao tận nơi</label>
                             </div>
                         </div>
                     </div>
 
                     <div class="mb-3" id="table-group">
                         <label class="small fw-bold">Chọn số bàn</label>
-                        <select id="table-number" class="form-select rounded-pill">
+                        <select name="table_number" id="table-number" class="form-select rounded-pill">
                             <option value="">-- Chọn bàn --</option>
                             <?php for ($i = 1; $i <= 20; $i++): ?>
                                 <option value="<?= $i ?>">Bàn số <?= $i ?></option>
@@ -235,7 +238,7 @@
 
                     <div class="mb-3 d-none" id="address-group">
                         <label class="small fw-bold">Địa chỉ nhận hàng</label>
-                        <textarea id="cust-address" class="form-control rounded-3" rows="2" placeholder="Số nhà, tên đường, phường/xã..."></textarea>
+                        <textarea name="address" id="cust-address" class="form-control rounded-3" rows="2" placeholder="Số nhà, tên đường, phường/xã..."></textarea>
                     </div>
 
                     <button type="submit" class="btn btn-orange w-100 rounded-pill py-2 fw-bold mt-2 shadow">XÁC NHẬN ĐẶT MÓN</button>
@@ -245,8 +248,5 @@
     </div>
 </div>
 
-
 <script src="/web_ban_oc_pro/public/assets/js/search.js"></script>
-<?php include __DIR__ . '/../layouts/modal_order.php'; ?>
-
 <?php include __DIR__ . '/../layouts/footer.php'; ?>

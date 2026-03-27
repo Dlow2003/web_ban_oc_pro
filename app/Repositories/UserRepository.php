@@ -18,13 +18,33 @@ class UserRepository {
     }
 
     public function create($data) {
-        $sql = "INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)";
-        $stmt = $this->db->prepare($sql);
-        return $stmt->execute([
-            $data['name'], 
-            $data['email'], 
-            $data['password'], 
-            $data['role']
-        ]);
+    $sql = "INSERT INTO users (username, phone, role, password) VALUES (?, ?, ?, ?)";
+    $stmt = $this->db->prepare($sql);
+    
+    $result = $stmt->execute([
+        $data['name'], 
+        $data['phone'], 
+        $data['role'], 
+        $data['password']
+    ]);
+
+    if ($result) {
+        return $this->db->lastInsertId(); 
     }
+    return false;
+}
+
+public function findByPhone($phone) {
+    $sql = "SELECT * FROM users WHERE phone = ? LIMIT 1";
+    
+    try {
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$phone]);
+        
+        return $stmt->fetch(\PDO::FETCH_ASSOC);
+    } catch (\PDOException $e) {
+        error_log("Lỗi findByPhone: " . $e->getMessage());
+        return false;
+    }
+}
 }

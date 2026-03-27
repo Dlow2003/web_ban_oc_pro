@@ -1,99 +1,111 @@
+//alert("JS Giỏ hàng đã kết nối thành công!");
 document.addEventListener('DOMContentLoaded', function() {
-    // 1. Khởi tạo Modal
+    
     const modalElem = document.getElementById('orderModal');
     let orderModal = null;
     if (modalElem) {
         orderModal = new bootstrap.Modal(modalElem);
     }
 
-    // 2. Xử lý lỗi ảnh sản phẩm (Dọn dẹp báo đỏ ở file PHP)
     const productImages = document.querySelectorAll('.product-img-container img');
     productImages.forEach(img => {
         img.addEventListener('error', function() {
-            this.onerror = null; // Ngăn vòng lặp vô tận
+            this.onerror = null; 
             this.src = 'https://via.placeholder.com/160x160?text=No+Image';
         });
     });
 
-    // Trong cart.js
-document.body.addEventListener('click', function(e) {
-    const btn = e.target.closest('.btn-add-cart');
-    if (!btn) return;
-
-    e.preventDefault();
-    const productId = btn.getAttribute('data-id');
-    const isLogged = btn.getAttribute('data-logged') === 'true';
-    
-    // Lấy số lượng từ ô input (nếu ở trang chi tiết)
-    const qtyInput = document.getElementById('detail-quantity');
-    const quantity = qtyInput ? parseInt(qtyInput.value) : 1;
-
-    if (isLogged) {
-        const formData = new FormData();
-        formData.append('id', productId);
-        formData.append('quantity', quantity); // Gửi số lượng khách chọn
-        sendCartData(formData);
-    } else {
-        // ... (Đoạn code hiện Modal giữ nguyên) ...
-        // Nhưng nhớ lưu quantity vào form để dùng khi submit modal
-        document.getElementById('form-confirm-order').setAttribute('data-temp-qty', quantity);
-        orderModal.show();
-    }
-});
-// Xử lý tăng giảm số lượng
-document.body.addEventListener('click', function(e) {
-    const btn = e.target.closest('.btn-update-qty');
-    if (btn) {
-        const id = btn.getAttribute('data-id');
-        const type = btn.getAttribute('data-type'); // 'plus' hoặc 'minus'
+    document.body.addEventListener('click', function(e) {
         
-        const formData = new FormData();
-        formData.append('id', id);
-        formData.append('type', type);
+        const btnAdd = e.target.closest('.btn-add-cart');
+        if (btnAdd) {
+            e.preventDefault();
+            const productId = btnAdd.getAttribute('data-id');
+            const isLogged = btnAdd.getAttribute('data-logged') === 'true';
+            
+            const qtyInput = document.getElementById('detail-quantity');
+            const quantity = qtyInput ? parseInt(qtyInput.value) : 1;
 
-        fetch('/web_ban_oc_pro/public/cart/update', {
-            method: 'POST',
-            body: formData
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.status === 'success') {
-                // 1. Cập nhật ô input số lượng của dòng đó
-                const row = document.getElementById(`cart-item-${id}`);
-                row.querySelector('input').value = data.newQty;
-
-                // 2. Cập nhật thành tiền của món đó
-                // Dat nhớ bọc số tiền vào 1 thẻ có class 'item-total' nhé
-                row.querySelector('.item-total').innerText = data.itemTotal;
-
-                // 3. Cập nhật tổng tiền cả giỏ hàng
-                document.getElementById('cart-total-price').innerText = data.cartTotal;
+            if (isLogged) {
+                const formData = new FormData();
+                formData.append('id', productId);
+                formData.append('quantity', quantity); 
+                sendCartData(formData);
+            } else {
+                const modalIdInput = document.getElementById('modal-product-id');
+                if (modalIdInput) modalIdInput.value = productId; 
+                
+                const orderForm = document.getElementById('form-confirm-order');
+                if (orderForm) orderForm.setAttribute('data-temp-qty', quantity); 
+                
+                orderModal.show();
             }
-        })
-        .catch(err => console.error("Lỗi:", err));
-    }
-});
+        }
 
+        const btnUpdate = e.target.closest('.btn-update-qty');
+        if (btnUpdate) {
+            const id = btnUpdate.getAttribute('data-id');
+            const type = btnUpdate.getAttribute('data-type'); 
+            
+            const formData = new FormData();
+            formData.append('id', id);
+            formData.append('type', type);
 
-const orderForm = document.getElementById('form-confirm-order');
-if (orderForm) {
-    orderForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const formData = new FormData(this); 
-        
-        formData.append('id', document.getElementById('modal-product-id').value);
-        
-        const tempQty = this.getAttribute('data-temp-qty') || 1;
-        formData.append('quantity', tempQty);
-        
-        const tableNum = document.getElementById('table-number');
-        if (tableNum) formData.append('table_number', tableNum.value);
+            fetch('/web_ban_oc_pro/public/cart/update', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    location.reload(); 
+                }
+            })
+            .catch(err => console.error("Lỗi cập nhật:", err));
+        }
 
-        sendCartData(formData);
+        const btnRemove = e.target.closest('.btn-remove-item');
+        if (btnRemove) {
+            e.preventDefault();
+            const id = btnRemove.getAttribute('data-id');
+
+            if (confirm('Bạn muốn bỏ món này khỏi giỏ hàng?')) {
+                const formData = new FormData();
+                formData.append('id', id);
+
+                fetch('/web_ban_oc_pro/public/cart/remove', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        location.reload(); 
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(err => console.error("Lỗi xóa:", err));
+            }
+        }
     });
-}
 
-    // 5. Hiện/Ẩn địa chỉ & số bàn khi chọn Ship/Tại quán
+    const orderForm = document.getElementById('form-confirm-order');
+    if (orderForm) {
+        orderForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this); 
+            
+            const tempQty = this.getAttribute('data-temp-qty') || 1;
+            formData.set('quantity', tempQty); 
+            
+            console.log("Dữ liệu gửi lên PHP:", Object.fromEntries(formData));
+
+            sendCartData(formData);
+        });
+    }
+
     const typeShip = document.getElementById('typeShip');
     const typeAtStore = document.getElementById('typeAtStore');
     const addressGroup = document.getElementById('address-group');
@@ -101,27 +113,24 @@ if (orderForm) {
 
     if (typeShip && typeAtStore) {
         typeShip.addEventListener('change', () => {
-            if(addressGroup) addressGroup.classList.remove('d-none'); 
-            if(tableGroup) tableGroup.classList.add('d-none');      
+            addressGroup?.classList.remove('d-none'); 
+            tableGroup?.classList.add('d-none');      
         });
 
         typeAtStore.addEventListener('change', () => {
-            if(addressGroup) addressGroup.classList.add('d-none');    
-            if(tableGroup) tableGroup.classList.remove('d-none');  
+            addressGroup?.classList.add('d-none');    
+            tableGroup?.classList.remove('d-none');  
         });
     }
 });
 
-// Hàm gửi dữ liệu tập trung
+
 function sendCartData(formData) {
     fetch('/web_ban_oc_pro/public/cart/add', {
         method: 'POST',
         body: formData
     })
-    .then(res => {
-        if (!res.ok) throw new Error('Network response was not ok');
-        return res.json();
-    })
+    .then(res => res.json())
     .then(data => {
         if (data.status === 'success') {
             alert(data.message);
@@ -135,32 +144,39 @@ function sendCartData(formData) {
         alert("Không thể kết nối đến máy chủ. Vui lòng kiểm tra lại XAMPP!");
     });
 }
-// Xử lý xóa món khỏi giỏ
-document.addEventListener('click', function(e) {
-    const btn = e.target.closest('.btn-remove-item');
-    if (btn) {
-        e.preventDefault();
-        const id = btn.getAttribute('data-id');
-        console.log("Đang muốn xóa món có ID:", id); // Kiểm tra xem JS có chạy vào đây không
+document.addEventListener('DOMContentLoaded', function() {
+    const btnCheckout = document.getElementById('btn-checkout'); 
 
-        if (confirm('Bỏ món này nhé?')) {
-            const formData = new FormData();
-            formData.append('id', id);
+    if (btnCheckout) {
+        btnCheckout.addEventListener('click', function(e) {
+            e.preventDefault();
 
-            fetch('/web_ban_oc_pro/public/cart/remove', {
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ĐANG GỬI ĐƠN...';
+            this.disabled = true;
+
+            fetch('/web_ban_oc_pro/public/order/checkout', {
                 method: 'POST',
-                body: formData
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                }
             })
             .then(res => res.json())
             .then(data => {
-                console.log("Kết quả từ Server:", data);
                 if (data.status === 'success') {
-                    location.reload(); // Cách đơn giản nhất: Reload lại để thấy kết quả xóa
+                    alert('Đã gửi đơn hàng thành công! Quán ốc SV đang chuẩn bị món cho Dat nhé.');
+                    window.location.href = '/web_ban_oc_pro/public/order/success';
                 } else {
-                    alert(data.message);
+                    alert('Lỗi: ' + data.message);
+                    this.innerHTML = 'GỬI ĐƠN HÀNG NGAY';
+                    this.disabled = false;
                 }
             })
-            .catch(err => console.error("Lỗi Fetch:", err));
-        }
+            .catch(err => {
+                console.error('Lỗi rồi:', err);
+                alert('Mạng lag hoặc Server tèo rồi cha nội ơi!');
+                this.innerHTML = 'GỬI ĐƠN HÀNG NGAY';
+                this.disabled = false;
+            });
+        });
     }
 });

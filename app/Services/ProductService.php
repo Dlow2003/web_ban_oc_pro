@@ -35,7 +35,6 @@ class ProductService {
     }
 
     public function getRelated($categoryId, $currentProductId, $limit = 4) {
-        // Truyền yêu cầu sang Repository để xử lý SQL
         return $this->repo->getRelated($categoryId, $currentProductId, $limit);
     }
 
