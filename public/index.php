@@ -69,5 +69,10 @@ $router->post('/cart/update', 'CartController@update');
 $router->post('/order/checkout', 'OrderController@checkout');
 $router->get('/order/success', 'OrderController@success');
 $router ->get('/order/history','OrderController@history');
+// Xem danh sách đơn hàng
+$router->get('/admin/orders', 'Admin\AdminOrderController@index');
+$router->post('/admin/orders/update', 'Admin\AdminOrderController@updateStatus');
+
+
 
 $router->run();

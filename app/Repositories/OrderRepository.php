@@ -47,6 +47,23 @@ public function getOrdersByUserId($userId) {
     $stmt->execute([$userId]);
     return $stmt->fetchAll(\PDO::FETCH_ASSOC);
 }
+
+public function getAllOrders() {
+    $sql = "SELECT o.*, u.username as customer_name, u.phone 
+            FROM orders o 
+            LEFT JOIN users u ON o.user_id = u.id 
+            ORDER BY o.created_at DESC";
+    
+    $stmt = $this->db->prepare($sql);
+    $stmt->execute();
+    return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+}
+
+public function updateStatus($orderId, $status) {
+    $sql = "UPDATE orders SET status = ? WHERE id = ?";
+    $stmt = $this->db->prepare($sql);
+    return $stmt->execute([$status, $orderId]);
+}
    public function saveOrder($data, $cart) {
     try {
         $this->db->beginTransaction();

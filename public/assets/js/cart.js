@@ -163,7 +163,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(res => res.json())
             .then(data => {
                 if (data.status === 'success') {
-                    alert('Đã gửi đơn hàng thành công! Quán ốc SV đang chuẩn bị món cho Dat nhé.');
+                    alert('Đã gửi đơn hàng thành công! Quán ốc SV đang chuẩn bị món cho bạn.');
                     window.location.href = '/web_ban_oc_pro/public/order/success';
                 } else {
                     alert('Lỗi: ' + data.message);
