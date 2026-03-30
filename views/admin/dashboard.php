@@ -20,7 +20,7 @@ include __DIR__ . '/layouts/header.php';
                 <a href="/web_ban_oc_pro/public/admin/product" class="list-group-item list-group-item-action border-0 py-3">
                     <i class="fas fa-fish me-2"></i> Quản lý món ăn
                 </a>
-                <a href="#" class="list-group-item list-group-item-action border-0 py-3">
+                <a href="/web_ban_oc_pro/public/admin/orders" class="list-group-item list-group-item-action border-0 py-3">
                     <i class="fas fa-shopping-cart me-2"></i> Đơn hàng
                 </a>
                 <a href="/web_ban_oc_pro/public/logout" class="list-group-item list-group-item-action border-0 py-3 text-danger">

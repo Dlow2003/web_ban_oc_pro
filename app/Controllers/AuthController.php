@@ -7,7 +7,6 @@ class AuthController extends HomeController {
     protected $authService;
 
     public function __construct() {
-        // Khởi tạo AuthService để giải quyết lỗi báo đỏ
         $this->authService = new AuthService();
     }
 
@@ -20,7 +19,6 @@ class AuthController extends HomeController {
             $email = $_POST['email'];
             $password = $_POST['password'];
 
-            // Sử dụng AuthService để kiểm tra đăng nhập thật từ Database
             $user = $this->authService->login($email, $password);
 
             if ($user) {
@@ -30,7 +28,6 @@ class AuthController extends HomeController {
                     'role' => $user['role']
                 ];
 
-                // Phân quyền: Admin vào Dashboard, User về trang chủ
                 if ($user['role'] === 'admin') {
                     header('Location: /web_ban_oc_pro/public/admin/dashboard');
                 } else {
@@ -38,7 +35,6 @@ class AuthController extends HomeController {
                 }
                 exit();
             } else {
-                // Trả về view login kèm thông báo lỗi
                 $this->render('auth/login', ['error' => 'Email hoặc mật khẩu không chính xác!']);
             }
         }

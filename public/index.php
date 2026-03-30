@@ -1,4 +1,5 @@
 <?php
+
 require_once __DIR__ . '/../vendor/autoload.php';
 
 
@@ -26,6 +27,7 @@ $router->post('/login', 'AuthController@postLogin');
 $router->get('/register', 'AuthController@register');
 $router->post('/register', 'AuthController@register');
 $router->get('/logout', 'AuthController@logout');
+$router->get('/logout', 'CartController@logout');
 
 $router->get('/menu', 'HomeController@menu');
 
@@ -56,4 +58,21 @@ $router->get('/admin/category/add', 'Admin\CategoryController@add');
 $router->post('/admin/category/store', 'Admin\CategoryController@store');
 $router->get('/admin/category/edit/(\d+)', 'Admin\CategoryController@edit');
 $router->post('/admin/category/update', 'Admin\CategoryController@update');
+
+$router->get('/api/search', 'HomeController@searchApi');
+// Route để thêm sản phẩm vào giỏ hàng
+$router->post('/cart/add', 'CartController@add');
+$router->get('/product/detail/(\d+)', 'ProductController@detail');
+$router->get('/cart', 'CartController@index');
+$router->post('/cart/remove', 'CartController@remove');
+$router->post('/cart/update', 'CartController@update');
+$router->post('/order/checkout', 'OrderController@checkout');
+$router->get('/order/success', 'OrderController@success');
+$router ->get('/order/history','OrderController@history');
+// Xem danh sách đơn hàng
+$router->get('/admin/orders', 'Admin\AdminOrderController@index');
+$router->post('/admin/orders/update', 'Admin\AdminOrderController@updateStatus');
+
+
+
 $router->run();

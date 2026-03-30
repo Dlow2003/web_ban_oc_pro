@@ -17,29 +17,38 @@ class ProductService {
     public function getProduct($id) { 
         return $this->repo->findById($id); 
     }
-  public function getPaginated($page = 1, $perPage = 8, $categoryId = null) {
-    $products = $this->repo->getByPage($page, $perPage, $categoryId);
-    
-    $totalProducts = $this->repo->countByStatus(1, $categoryId); 
-    $totalPages = ceil($totalProducts / $perPage);
 
-    return [
-        'products' => $products,
-        'totalPages' => $totalPages,
-        'currentPage' => $page
-    ];
-}
-public function getAdminPaginated($page = 1, $perPage = 10) {
-    $products = $this->repo->getByPageAdmin($page, $perPage);
-    $totalProducts = $this->repo->countAll();
-    $totalPages = ceil($totalProducts / $perPage);
+    public function getById($id) {
+        return $this->repo->findById($id);
+    }
 
-    return [
-        'products' => $products,
-        'totalPages' => $totalPages,
-        'currentPage' => $page
-    ];
-}
+    public function getPaginated($page = 1, $perPage = 8, $categoryId = null, $keyword = null) {
+        $products = $this->repo->getByPage($page, $perPage, $categoryId, $keyword);
+        $totalProducts = $this->repo->countByStatus(1, $categoryId, $keyword); 
+        $totalPages = ceil($totalProducts / $perPage);
+
+        return [
+            'products' => $products,
+            'totalPages' => $totalPages,
+            'currentPage' => $page
+        ];
+    }
+
+    public function getRelated($categoryId, $currentProductId, $limit = 4) {
+        return $this->repo->getRelated($categoryId, $currentProductId, $limit);
+    }
+
+    public function getAdminPaginated($page = 1, $perPage = 10) {
+        $products = $this->repo->getByPageAdmin($page, $perPage);
+        $totalProducts = $this->repo->countAll();
+        $totalPages = ceil($totalProducts / $perPage);
+
+        return [
+            'products' => $products,
+            'totalPages' => $totalPages,
+            'currentPage' => $page
+        ];
+    }
 
     public function saveProduct($data, $file) {
         $data['slug'] = $this->createSlug($data['name']);
