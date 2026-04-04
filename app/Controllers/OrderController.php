@@ -6,31 +6,39 @@ use App\Repositories\OrderRepository;
 class OrderController {
     
     public function checkout() {
-        header('Content-Type: application/json');
+    header('Content-Type: application/json');
+    if (session_status() === PHP_SESSION_NONE) session_start();
 
-        if (empty($_SESSION['cart'])) {
-            echo json_encode(['status' => 'error', 'message' => 'Giỏ hàng của Dat đang trống!']);
-            return;
-        }
+    if (empty($_SESSION['cart'])) {
+        echo json_encode(['status' => 'error', 'message' => 'Giỏ hàng của Dat đang trống!']);
+        return;
+    }
 
-        $total = 0;
-        foreach ($_SESSION['cart'] as $item) {
-            $total += $item['price'] * $item['quantity'];
-        }
+    $total = 0;
+    foreach ($_SESSION['cart'] as $item) {
+        $total += $item['price'] * $item['quantity'];
+    }
 
-        $user = $_SESSION['user'] ?? null;
+    $user = $_SESSION['user'] ?? null;
+    
+    $userId = (isset($user['id']) && (int)$user['id'] > 0) ? (int)$user['id'] : null;
 
-        $data = [
-            'user_id'          => $user['id'] ?? null,
-            'customer_name'    => $user['fullname'] ?? $user['name'] ?? 'Khách vãng lai',
-            'customer_phone'   => $user['phone'] ?? null,
-            'customer_email'   => $user['email'] ?? null,
-            'shipping_address' => $_POST['address'] ?? 'Tại quán',
-            'note'             => $_POST['note'] ?? '',
-            'total_amount'     => $total,
-            'payment_method'   => 'cod', 
-            'status'           => 'pending' 
-        ];
+    $orderType = $user['type'] ?? 'at_store';
+    $shippingInfo = ($orderType === 'at_store') 
+                ? "Bàn số: " . ($user['table'] ?? 'Chưa chọn') 
+                : ($user['address'] ?? 'Giao tận nơi');
+
+    $data = [
+        'user_id'          => $userId, 
+        'customer_name'    => $user['name'] ?? 'Khách vãng lai',
+        'customer_phone'   => $user['phone'] ?? null,
+        'customer_email'   => $user['email'] ?? null,
+        'shipping_address' => $shippingInfo,
+        'note'             => $_POST['note'] ?? '',
+        'total_amount'     => $total,
+        'payment_method'   => 'cod', 
+        'status'           => 'pending' 
+    ];
 
         try {
             $orderRepo = new OrderRepository(); 

@@ -39,17 +39,19 @@ class CartController extends BaseController
         exit;
     }
 
-    if (!isset($_SESSION['user'])) {
+    if (!isset($_SESSION['user']) || empty($_SESSION['user']['id'])) {
         $phone = $_POST['phone'] ?? '';
         $inputName = !empty($_POST['name']) ? $_POST['name'] : 'Khách lạ';
+        $table = $_POST['table_number'] ?? ''; 
+        $address = $_POST['address'] ?? '';     
 
         if (!empty(trim($phone))) {
-            $userRepo = new UserRepository();
+            $userRepo = new \App\Repositories\UserRepository();
             $existingUser = $userRepo->findByPhone($phone);
 
             if ($existingUser) {
                 $userId = $existingUser['id'];
-                $finalName = $existingUser['name']; 
+                $finalName = $existingUser['name'] ?? $existingUser['username'];
             } else {
                 $userId = $userRepo->create([
                     'name' => $inputName,
@@ -57,29 +59,32 @@ class CartController extends BaseController
                     'role' => 'customer',
                     'password' => password_hash('123456', PASSWORD_DEFAULT)
                 ]);
+
+                if (!$userId) {
+                    echo json_encode(['status' => 'error', 'message' => 'Lỗi: Không thể tạo tài khoản người dùng!']);
+                    exit;
+                }
                 $finalName = $inputName;
             }
 
             $_SESSION['user'] = [
-                'id'      => $userId, 
-                'name'    => $finalName, 
-                'phone'   => $phone,
-                'address' => $_POST['address'] ?? '',
-                'type'    => $_POST['orderType'] ?? 'at_store', 
-                'table'   => $_POST['table_number'] ?? '',
-                'role'    => 'customer'
+                'id'    => $userId, 
+                'name'  => $finalName,
+                'phone' => $phone,
+                'table' => $table,    
+                'address' => $address,
+                'type'  => $_POST['orderType'] ?? 'at_store',
+                'role'  => 'customer'
             ];
         } else {
-            echo json_encode(['status' => 'error', 'message' => 'Vui lòng cung cấp số điện thoại!']);
+            echo json_encode(['status' => 'error', 'message' => 'Vui lòng nhập số điện thoại!']);
             exit;
         }
     }
 
     $product = $this->productService->getById($id);
-
     if ($product) {
         if (!isset($_SESSION['cart'])) $_SESSION['cart'] = [];
-
         if (isset($_SESSION['cart'][$id])) {
             $_SESSION['cart'][$id]['quantity'] += $quantity;
         } else {
@@ -90,16 +95,11 @@ class CartController extends BaseController
                 'quantity' => $quantity
             ];
         }
-
-        $displayName = $_SESSION['user']['name'];
-        
         echo json_encode([
             'status'     => 'success',
             'totalItems' => count($_SESSION['cart']),
-            'message'    => 'Đã thêm ' . $product['name'] . '. Chào ' . $displayName . ', món đã vào giỏ!'
+            'message'    => 'Chào ' . $_SESSION['user']['name'] . ', đã thêm ' . $product['name'] . ' vào giỏ!'
         ]);
-    } else {
-        echo json_encode(['status' => 'error', 'message' => 'Sản phẩm không tồn tại']);
     }
     exit;
 }

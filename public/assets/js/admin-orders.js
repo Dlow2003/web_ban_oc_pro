@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     form.submit();
                 } else {
                     location.reload();
-                }
+                }  
             });
         });
     });

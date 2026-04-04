@@ -22,7 +22,7 @@
             <ul class="navbar-nav ms-auto align-items-center">
                 <li class="nav-item"><a class="nav-link text-white fw-bold me-3" href="/web_ban_oc_pro/public/">Trang chủ</a></li>
                 <li class="nav-item"><a class="nav-link text-white fw-bold me-3" href="#">Bạn cần hỗ trợ?</a></li>
-                <li class="nav-item"><a class="nav-link text-white fw-bold me-4" href="#">Đơn hàng</a></li>
+                <li class="nav-item"><a class="nav-link text-white fw-bold me-4" href="/web_ban_oc_pro/public/order/history">Đơn hàng</a></li>
 
                 
                 

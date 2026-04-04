@@ -1,3 +1,5 @@
+<?php include __DIR__ . '../../layouts/header.php'; ?>
+
 <div class="container-fluid admin-container">
     <div class="admin-card">
         <div class="card-header d-flex justify-content-between align-items-center">

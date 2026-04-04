@@ -91,20 +91,43 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     const orderForm = document.getElementById('form-confirm-order');
-    if (orderForm) {
-        orderForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const formData = new FormData(this); 
-            
-            const tempQty = this.getAttribute('data-temp-qty') || 1;
-            formData.set('quantity', tempQty); 
-            
-            console.log("Dữ liệu gửi lên PHP:", Object.fromEntries(formData));
+if (orderForm) {
+    orderForm.addEventListener('submit', function(e) {
+        e.preventDefault();
 
-            sendCartData(formData);
-        });
-    }
+        const orderType = document.querySelector('input[name="orderType"]:checked').value;
+        const tableNumber = document.getElementById('table-number').value;
+        const address = document.getElementById('cust-address').value.trim();
+
+        if (orderType === 'at_store' && tableNumber === "") {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Chưa chọn bàn!',
+                text: 'Dat ơi, vui lòng chọn số bàn để quán phục vụ nhé.',
+                confirmButtonColor: '#ff6600'
+            });
+            return false;
+        }
+
+        if (orderType === 'ship' && address === "") {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Thiếu địa chỉ!',
+                text: 'Bạn vui lòng nhập địa chỉ để quán ship ốc tận nơi nha.',
+                confirmButtonColor: '#ff6600'
+            });
+            return false;
+        }
+
+        const formData = new FormData(this);
+        const tempQty = this.getAttribute('data-temp-qty') || 1;
+        formData.set('quantity', tempQty); 
+
+        sendCartData(formData);
+        
+        if (orderModal) orderModal.hide();
+    });
+}
 
     const typeShip = document.getElementById('typeShip');
     const typeAtStore = document.getElementById('typeAtStore');
@@ -144,6 +167,19 @@ function sendCartData(formData) {
         alert("Không thể kết nối đến máy chủ. Vui lòng kiểm tra lại XAMPP!");
     });
 }
+$('input[name="orderType"]').change(function() {
+    if (this.value === 'at_store') {
+        $('#table-group').removeClass('d-none');
+        $('#address-group').addClass('d-none');
+        $('#table-number').attr('required', true);
+        $('#cust-address').removeAttr('required');
+    } else {
+        $('#table-group').addClass('d-none');
+        $('#address-group').removeClass('d-none');
+        $('#cust-address').attr('required', true);
+        $('#table-number').removeAttr('required');
+    }
+});
 document.addEventListener('DOMContentLoaded', function() {
     const btnCheckout = document.getElementById('btn-checkout'); 
 
