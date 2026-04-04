@@ -1,3 +1,5 @@
+<?php include __DIR__ . '../../layouts/header.php'; ?>
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -60,3 +62,4 @@
     </div>
 </body>
 </html>
+<?php include __DIR__ . '../../layouts/footer.php'; ?>

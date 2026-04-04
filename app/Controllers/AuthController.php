@@ -24,7 +24,7 @@ class AuthController extends HomeController {
             if ($user) {
                 $_SESSION['user'] = [
                     'id'   => $user['id'],
-                    'name' => $user['name'],
+                    'name' => $user['name'] ?? $user['username'] ?? 'khách',
                     'role' => $user['role']
                 ];
 
@@ -71,7 +71,7 @@ public function logout() {
     unset($_SESSION['user']);
 
     session_destroy();
-    header('Location: /web_ban_oc_pro/public/login');
+    header('Location: /web_ban_oc_pro/public');
     exit();
 }
 }

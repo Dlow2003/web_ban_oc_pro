@@ -17,22 +17,25 @@ class UserRepository {
         return $stmt->fetch(); 
     }
 
-    public function create($data) {
-    $sql = "INSERT INTO users (username, phone, role, password) VALUES (?, ?, ?, ?)";
-    $stmt = $this->db->prepare($sql);
-    
-    $result = $stmt->execute([
-        $data['name'], 
-        $data['phone'], 
-        $data['role'], 
-        $data['password']
-    ]);
-
-    if ($result) {
-        return $this->db->lastInsertId(); 
+   public function create($data) {
+    try {
+        $sql = "INSERT INTO users (username, phone, address, role, password) 
+                VALUES (?, ?, ?, ?, ?)";
+        $stmt = $this->db->prepare($sql);
+        $result = $stmt->execute([
+            $data['name'], 
+            $data['phone'], 
+            $data['address'] ?? null,
+            $data['role'] ?? 'customer',
+            $data['password']
+        ]);
+        return $result ? $this->db->lastInsertId() : false;
+    } catch (\PDOException $e) {
+        // die($e->getMessage()); 
+        return false;
     }
-    return false;
 }
+
 
 public function findByPhone($phone) {
     $sql = "SELECT * FROM users WHERE phone = ? LIMIT 1";

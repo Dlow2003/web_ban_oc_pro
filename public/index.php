@@ -67,6 +67,7 @@ $router->get('/cart', 'CartController@index');
 $router->post('/cart/remove', 'CartController@remove');
 $router->post('/cart/update', 'CartController@update');
 $router->post('/order/checkout', 'OrderController@checkout');
+$router->get('/checkout', 'OrderController@checkoutView');
 $router->get('/order/success', 'OrderController@success');
 $router ->get('/order/history','OrderController@history');
 // Xem danh sách đơn hàng
